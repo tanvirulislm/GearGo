@@ -8,6 +8,7 @@ use App\Models\Customer;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\ImageColumn;
@@ -26,24 +27,9 @@ class CustomerResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('phone')
-                    ->required()
-                    ->maxLength(15)
-                    ->unique(ignoreRecord: true),
-                TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true),
-                FileUpload::make('profile_photo')
-                    ->nullable()
-                    ->image()
-                    ->directory('profile_photos'),
-            ]);
+            ->schema(
+                self::getCustomerFormSchema(),
+            );
     }
 
     public static function table(Table $table): Table
@@ -98,6 +84,30 @@ class CustomerResource extends Resource
             'index' => Pages\ListCustomers::route('/'),
             // 'create' => Pages\CreateCustomer::route('/create'),
             // 'edit' => Pages\EditCustomer::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getCustomerFormSchema(): array
+    {
+        return [
+            Section::make()->schema([
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('phone')
+                    ->required()
+                    ->maxLength(15)
+                    ->unique(ignoreRecord: true),
+                TextInput::make('email')
+                    ->email()
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
+                FileUpload::make('profile_photo')
+                    ->nullable()
+                    ->image()
+                    ->directory('profile_photos'),
+            ])->columns(2)
         ];
     }
 }

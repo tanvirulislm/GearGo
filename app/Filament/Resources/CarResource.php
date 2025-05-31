@@ -29,7 +29,95 @@ class CarResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
+            ->schema(
+                self::getCarFormSchema()
+            );
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('brand')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('model')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('year')
+                    ->sortable(),
+                TextColumn::make('car_type')
+                    ->sortable(),
+                TextColumn::make('fuel_type')
+                    ->sortable(),
+                TextColumn::make('transmission')
+                    ->sortable(),
+                TextColumn::make('mileage')
+                    ->sortable(),
+                TextColumn::make('seats')
+                    ->sortable(),
+                TextColumn::make('color')
+                    ->sortable(),
+                TextColumn::make('registration_number')
+                    ->sortable(),
+                TextColumn::make('daily_rent_price')
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->sortable()
+                    ->badge()
+                    ->colors([
+                        'danger' => 'maintenance',
+                        'warning' => 'rented',
+                        'success' => 'available',
+                    ])
+                    ->icon(fn($state) => match ($state) {
+                        'maintenance' => 'heroicon-o-wrench',
+                        'rented' => 'heroicon-o-clock',
+                        'available' => 'heroicon-o-check-badge',
+                        default => null,
+                    })
+                    ->formatStateUsing(fn($state) => match ($state) {
+                        'maintenance' => 'Maintenance',
+                        'rented' => 'Rented',
+                        'available' => 'Available',
+                        default => $state
+                    }),
+                ImageColumn::make('image')
+                    ->sortable(),
+            ])
+            ->filters([
+                //
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListCars::route('/'),
+            'create' => Pages\CreateCar::route('/create'),
+            'edit' => Pages\EditCar::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getCarFormSchema()
+    {
+        return [
+            Forms\Components\Section::make()->schema([
                 TextInput::make('brand')
                     ->required()
                     ->maxLength(255)
@@ -150,86 +238,8 @@ class CarResource extends Resource
                     ->disk('public')
                     ->directory('car_images')
                     ->preserveFilenames(),
-            ]);
-    }
+            ])->columns(2)
 
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                TextColumn::make('brand')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('model')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('year')
-                    ->sortable(),
-                TextColumn::make('car_type')
-                    ->sortable(),
-                TextColumn::make('fuel_type')
-                    ->sortable(),
-                TextColumn::make('transmission')
-                    ->sortable(),
-                TextColumn::make('mileage')
-                    ->sortable(),
-                TextColumn::make('seats')
-                    ->sortable(),
-                TextColumn::make('color')
-                    ->sortable(),
-                TextColumn::make('registration_number')
-                    ->sortable(),
-                TextColumn::make('daily_rent_price')
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->sortable()
-                    ->badge()
-                    ->colors([
-                        'danger' => 'maintenance',
-                        'warning' => 'rented',
-                        'success' => 'available',
-                    ])
-                    ->icon(fn($state) => match ($state) {
-                        'maintenance' => 'heroicon-o-wrench',
-                        'rented' => 'heroicon-o-clock',
-                        'available' => 'heroicon-o-check-badge',
-                        default => null,
-                    })
-                    ->formatStateUsing(fn($state) => match ($state) {
-                        'maintenance' => 'Maintenance',
-                        'rented' => 'Rented',
-                        'available' => 'Available',
-                        default => $state
-                    }),
-                ImageColumn::make('image')
-                    ->sortable(),
-            ])
-            ->filters([
-                //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListCars::route('/'),
-            'create' => Pages\CreateCar::route('/create'),
-            'edit' => Pages\EditCar::route('/{record}/edit'),
         ];
     }
 }
